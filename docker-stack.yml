@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+
+  stack:
+    image: zastial/trading-corp-bot:latest
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      rollback_config:
+        parallelism: 1
+        delay: 5s
+    environment:
+      - REDIS_URL=redis:6379
+      - REDIS_TTL=600
+      - CACHE_KEY_STOCKS_ALL=nasdaq:stocks:all
+      - N8N_BASE_URL=https://n8n.zastial.com
+      - N8N_PROD=true
+    networks:
+      - bot_network
+    depends_on:
+      - redis
+    secrets:
+      - DISCORD_BOT_TOKEN
+      - DISCORD_APP_ID
+      - N8N_API_KEY
+      - N8N_WEBHOOK_PATH
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --save "" --appendonly no
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - redis_data:/data
+    networks:
+      - bot_network
+
+networks:
+  bot_network:
+    driver: overlay
+
+volumes:
+  redis_data:
+
+secrets:
+  DISCORD_BOT_TOKEN:
+    external: true
+  DISCORD_APP_ID:
+    external: true
+  N8N_API_KEY:
+    external: true
+  N8N_WEBHOOK_PATH:
+    external: true
