@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      IMAGE_NAME: zastial/trading-corp-bot
+      STACK_SERVICE_NAME: trading_corp_bot_stack
     steps:
       - uses: actions/checkout@v4
       - name: Set up QEMU
@@ -26,8 +29,21 @@ jobs:
         with:
           context: .
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: |
-            zastial/trading-corp-bot:latest
-            zastial/trading-corp-bot:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - name: Deploy on VM over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VM_SSH_HOST }}
+          username: ${{ secrets.VM_SSH_USER }}
+          key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            docker service update \
+              --with-registry-auth \
+              --image ${{ env.IMAGE_NAME }}:${{ github.sha }} \
+              ${{ env.STACK_SERVICE_NAME }}
