@@ -3,7 +3,14 @@
 Bot Discord de recherche et d'analyse de tickers et
 intégré avec n8n pour les traitements externes.
 
-Workflow n8n actuel :
+## But du projet :
+
+Après la découverte de Make puis de n8n, j'ai voulu utiliser l'automatisation pour simplifier le traitement des informations de trading.
+Dans un premier temps, j'ai créé un workflow afin de m'envoyer chaque jour, un résumé des informations les plus importantes, liées à mon portefeuille ou non.
+Pour permettre à d'autres d'en profiter, j'ai créé ce bot discord afin que chacun ait un accès direct et rapide aux dernières informations.
+Pour le choix du langage, j'ai hésité entre Go et Python. Les 2 étant des langages intéressants, Go m'a paru plus intéressant notamment dans la connexion avec Redis mais surtout car c'est un langage que j'apprécie et que je n'avais pas utilisé depuis quelque temps.
+
+## Workflow n8n actuel :
 ![workflow](assets/workflow.png)
 
 ## Installation
